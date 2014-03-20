@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+
+<project name="NTS" default="compile" basedir=".">
+    <description>
+        Java parser for Numerical Transition Systems (NTS).
+    </description>
+
+    <!-- The settings can be overridden in local.properties. -->
+    <property environment="env" />
+    <property name="java.home" value="${env.JAVA_HOME}" />
+
+    <!-- paths -->
+    <property name="base.dir" value="${basedir}" />
+    <property name="sources.dir" value="${base.dir}/src" />
+    <property name="sources.generated.dir" value="${base.dir}/src-gen" />
+    <property name="dist.dir" value="${base.dir}/dist" />
+    <property name="lib.dir" value="${base.dir}/lib" />
+    <property name="build.dir" value="${base.dir}/bin" />
+    
+    <!-- libraries -->
+    <property name="antlr.jar" value="${lib.dir}/antlr-3.3-complete.jar" />
+
+    <!-- other properties -->
+    <property name="dist.jar" value="${dist.dir}/nts.jar" />
+
+
+    <target name="generate" description="Generates the lexer and parser for relational calculator.">
+        <echo>Generating the lexer and parser for relational calculator ...</echo>
+        <java classname="org.antlr.Tool" failonerror="true" >
+            <!-- <arg value="-fo"/>
+            <arg value="${sources.generated.dir}/verimag/flata/parsers"/> -->
+            <arg value="${sources.dir}/nts/parser/NTS.g"/>
+            <classpath>
+                <pathelement location="${antlr.jar}" />
+            </classpath>
+        </java>
+    </target>
+    
+    <target name="compile-base" description="Compiles .java files">
+        <mkdir dir="${build.dir}"  />
+        <mkdir dir="${dist.dir}"   />
+        <javac destdir="${build.dir}" includeantruntime="false" failonerror="true"  >
+            <src path="${sources.dir}" />
+            <!-- <src path="${sources.generated.dir}" /> -->
+            <include name="**/*.java" />
+            <!-- <compilerarg value="-Xlint:all"/> -->
+            <classpath>
+                <pathelement location="${antlr.jar}" />
+            </classpath>
+        </javac>
+    </target>
+
+    <target name="compile" depends="compile-base" description="Compiles .java files and creates a .jar file">
+        <jar destfile="${dist.jar}" >
+            <fileset dir="${build.dir}" includes="**/*.class" />
+        </jar>
+        <mkdir dir="${dist.dir}"   />
+        <copy todir="${dist.dir}/lib">
+            <fileset dir="${lib.dir}"/>
+        </copy>
+    </target>
+
+    <target name="clean" description="cleans up">
+        <delete dir="${build.dir}" includeemptydirs="yes" quiet="yes" failonerror="no" />
+        <delete dir="${dist.dir}" includeemptydirs="yes" quiet="yes" failonerror="no" />
+        <!-- <delete dir="${sources.generated.dir}" includeemptydirs="yes" quiet="yes" failonerror="no" /> -->
+    </target>
+
+</project>
